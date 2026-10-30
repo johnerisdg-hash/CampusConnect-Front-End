@@ -60,6 +60,12 @@ export default function UpcomingEvents({ basePath = '/admin' }) {
               <p className="admin-meta-line">{event.organization_name || 'General'} · {event.location || 'TBD'}</p>
               <p className="admin-meta-line">{fmt(event.start_at)}</p>
               <p className="admin-meta-line">Registered: {event.registered_count || 0}</p>
+              {basePath === '/org' && event.display_status === 'rejected' && (
+                <div className="note-box">
+                  <b>Rejected by the admin</b>
+                  <p>Reason: {event.review_note || 'No reason was given.'}</p>
+                </div>
+              )}
               <div className="admin-card-actions">
                 <Link to={`${basePath}/events/${event.id}/attendance`} className="admin-button blue small">Attendance &amp; fines</Link>
                 <Link to={`${basePath}/events/${event.id}/edit`} className="admin-button gray small">Edit</Link>

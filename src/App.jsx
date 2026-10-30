@@ -9,6 +9,7 @@ import MyEvents from './pages/student/MyEvents.jsx';
 import AdminLayout from './pages/admin/AdminLayout.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import UpcomingEvents from './pages/admin/UpcomingEvents.jsx';
+import ReviewEvent from './pages/admin/ReviewEvent.jsx';
 import CreateEvent from './pages/admin/CreateEvent.jsx';
 import EditEvent from './pages/admin/EditEvent.jsx';
 import Attendance from './pages/admin/Attendance.jsx';
@@ -48,6 +49,7 @@ export default function App() {
         <Route element={<AdminLayout />}>
           <Route path="/admin" element={<UpcomingEvents />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/review/:id" element={<ReviewEvent />} />
           <Route path="/admin/upcoming" element={<Navigate to="/admin" replace />} />
           <Route path="/admin/create-event" element={<CreateEvent />} />
           <Route path="/admin/events/:id/edit" element={<EditEvent />} />
@@ -59,6 +61,7 @@ export default function App() {
         <Route element={<OrganizationLayout />}>
           <Route path="/org" element={<UpcomingEvents basePath="/org" />} />
           <Route path="/org/dashboard" element={<AdminDashboard basePath="/org" />} />
+          <Route path="/org/events/new" element={<CreateOrganizationEvent />} />
           <Route path="/org/create-event" element={<CreateOrganizationEvent />} />
           <Route path="/org/events/:id/edit" element={<EditEvent />} />
           <Route path="/org/events/:id/attendance" element={<Attendance />} />

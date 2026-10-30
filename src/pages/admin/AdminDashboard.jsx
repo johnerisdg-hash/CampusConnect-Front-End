@@ -48,26 +48,6 @@ export default function AdminDashboard({ basePath = '/admin' }) {
     }
   }
 
-  async function reviewEvent(event, status) {
-    let note = '';
-    if (status === 'rejected') {
-      note = window.prompt(`Optional: enter a reason for rejecting "${event.title}".`) || '';
-    }
-
-    setBusyEvent(event.id);
-    setError('');
-    try {
-      await api.post(`/admin/events/${event.id}/status`, { status, note });
-      setEvents((current) => current.map((item) => (
-        String(item.id) === String(event.id) ? { ...item, status } : item
-      )));
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusyEvent(null);
-    }
-  }
-
   const rows = useMemo(
     () =>
       events.map((event) => ({
@@ -128,38 +108,30 @@ export default function AdminDashboard({ basePath = '/admin' }) {
                 <td>{event.fines == null ? '—' : `₱${event.fines.toFixed(2)}`}</td>
                 <td>
                   <div className="admin-action-stack">
-                    <Link to={`${basePath}/events/${event.id}/attendance`} className="admin-button blue">Attendance &amp; fines</Link>
-                    <Link to={`${basePath}/events/${event.id}/scan`} className="admin-button green">Scan</Link>
-                    <Link to={`${basePath}/events/${event.id}/edit`} className="admin-button gray">Edit</Link>
-                    {isAdmin && event.status === 'pending' && (
-                      <>
-                        <button
-                          type="button"
-                          className="admin-button green"
-                          onClick={() => reviewEvent(event, 'approved')}
-                          disabled={busyEvent === event.id}
-                        >
-                          {busyEvent === event.id ? 'Saving…' : 'Approve'}
-                        </button>
-                        <button
-                          type="button"
-                          className="admin-button red"
-                          onClick={() => reviewEvent(event, 'rejected')}
-                          disabled={busyEvent === event.id}
-                        >
-                          {busyEvent === event.id ? 'Saving…' : 'Reject'}
-                        </button>
-                      </>
-                    )}
-                    {(event.status === 'approved' || event.status === 'pending' || event.status === 'cancelled') && (
-                      <button
-                        type="button"
-                        className={`admin-button ${event.status === 'cancelled' ? 'green' : 'red'}`}
-                        onClick={() => changeStatus(event)}
-                        disabled={busyEvent === event.id}
+                    {isAdmin && !['approved', 'cancelled'].includes(event.status) ? (
+                      <Link
+                        to={`${basePath}/review/${event.id}`}
+                        state={{ returnTo: `${basePath}/dashboard` }}
+                        className="admin-button blue"
                       >
-                        {busyEvent === event.id ? 'Saving…' : event.status === 'cancelled' ? 'Reopen event' : 'Cancel event'}
-                      </button>
+                        View &amp; review
+                      </Link>
+                    ) : (
+                      <>
+                        <Link to={`${basePath}/events/${event.id}/attendance`} className="admin-button blue">Attendance &amp; fines</Link>
+                        <Link to={`${basePath}/events/${event.id}/scan`} className="admin-button green">Scan</Link>
+                        <Link to={`${basePath}/events/${event.id}/edit`} className="admin-button gray">Edit</Link>
+                        {(event.status === 'approved' || event.status === 'cancelled') && (
+                          <button
+                            type="button"
+                            className={`admin-button ${event.status === 'cancelled' ? 'green' : 'red'}`}
+                            onClick={() => changeStatus(event)}
+                            disabled={busyEvent === event.id}
+                          >
+                            {busyEvent === event.id ? 'Saving…' : event.status === 'cancelled' ? 'Reopen event' : 'Cancel event'}
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </td>
