@@ -1197,4 +1197,6 @@ table.kv th { width: 200px; vertical-align: top; }
 table.diff th { width: 180px; }
 table.diff tr.changed td, table.diff tr.changed th { background: color-mix(in srgb, var(--amber) 16%, transparent); }
 .thumb { max-width: 160px; max-height: 110px; border-radius: 8px; display: block; margin: 6px 0; }
+.actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn.small { padding: 6px 12px; font-size: .85rem; }
 @media (max-width: 640px) { .two { grid-template-columns: 1fr; } }

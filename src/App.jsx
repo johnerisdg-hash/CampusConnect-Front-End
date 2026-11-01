@@ -16,6 +16,7 @@ import Attendance from './pages/admin/Attendance.jsx';
 import ScanEvent from './pages/admin/ScanEvent.jsx';
 import OrganizationLayout from './pages/organization/OrganizationLayout.jsx';
 import CreateOrganizationEvent from './pages/organization/CreateOrganizationEvent.jsx';
+import Accounts from './pages/admin/Accounts.jsx';
 
 function Protected({ roles, loginPath }) {
   const { user } = useAuth();
@@ -27,6 +28,11 @@ function Protected({ roles, loginPath }) {
 const studentLinks = [
   { to: '/', label: 'Events', end: true },
   { to: '/my-events', label: 'My Attendance' }
+];
+
+const adminLinks = [
+  { to: '/admin', label: 'Approvals', end: true },
+  { to: '/admin/accounts', label: 'Accounts' }
 ];
 
 export default function App() {
@@ -55,6 +61,7 @@ export default function App() {
           <Route path="/admin/events/:id/edit" element={<EditEvent />} />
           <Route path="/admin/events/:id/attendance" element={<Attendance />} />
           <Route path="/admin/events/:id/scan" element={<ScanEvent />} />
+          <Route path="/admin/accounts" element={<Accounts />} />
         </Route>
       </Route>
       <Route element={<Protected roles={['organizer']} loginPath={LOGIN.organizer} />}>

@@ -25,6 +25,9 @@ export default function AdminLayout() {
           <NavLink to="/admin/create-event" className={({ isActive }) => (isActive ? 'admin-nav-link active' : 'admin-nav-link')}>
             Create Event
           </NavLink>
+          <a href="/admin/accounts" className="admin-nav-link">
+            Accounts
+          </a>
         </nav>
 
         <div className="admin-header-actions">
