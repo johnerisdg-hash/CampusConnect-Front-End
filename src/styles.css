@@ -906,6 +906,7 @@ table.att td,table.att th{padding:8px 10px;font-size:12.5px}
   box-shadow:var(--shadow);
 }
 .admin-event-status.upcoming{background:var(--g-soft);border-color:var(--g);color:var(--g)}
+.admin-event-status.approved{background:var(--g-soft);border-color:var(--g);color:var(--g)}
 .admin-event-status.ongoing{background:var(--g);border-color:var(--g);color:var(--on-g)}
 .admin-event-status.done{background:var(--btn);border-color:var(--bd);color:var(--mute)}
 .admin-event-status.cancelled{background:var(--red-soft);border-color:var(--red-line);color:var(--red)}
@@ -1200,3 +1201,35 @@ table.diff tr.changed td, table.diff tr.changed th { background: color-mix(in sr
 .actions { display: flex; gap: 6px; flex-wrap: wrap; }
 .btn.small { padding: 6px 12px; font-size: .85rem; }
 @media (max-width: 640px) { .two { grid-template-columns: 1fr; } }
+
+/* Student navigation follows the admin and organization header design. */
+.student-topbar{
+  position:relative;
+  z-index:5;
+}
+.student-topbar .admin-brand{color:var(--ink);white-space:nowrap}
+.student-topbar .admin-brand span{color:var(--mute);font-size:13px;font-weight:600}
+.student-topbar .pill{
+  min-height:36px;
+  padding:0 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--surface);
+  color:var(--ink);
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+}
+.student-topbar .pill:hover{background:var(--surface-2);border-color:var(--bd)}
+.student-topbar .pill:focus-visible,
+.student-topbar .admin-nav-link:focus-visible,
+.student-topbar .admin-logout:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--g) 35%,transparent);
+  outline-offset:2px;
+}
+.student-page{width:100%}
+
+@media (max-width:760px){
+  .student-topbar .admin-user-label{display:none}
+  .student-topbar .admin-header-actions{gap:8px}
+}

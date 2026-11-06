@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../../api.js';
-import { Badge, fmt, calendarUrl } from '../../ui.jsx';
+import { Badge, fmt, peso, calendarUrl } from '../../ui.jsx';
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -10,7 +10,11 @@ export default function EventDetail() {
   const [error, setError] = useState('');
 
   const load = () => api.get(`/events/${id}`).then(setData).catch((e) => setError(e.message));
-  useEffect(() => { load(); }, [id]);
+
+  useEffect(() => {
+    setData(null); setMsg(''); setError('');
+    load();
+  }, [id]);
 
   async function register() {
     setMsg(''); setError('');
@@ -23,7 +27,18 @@ export default function EventDetail() {
     }
   }
 
-  if (error && !data) return <p className="error">{error}</p>;
+  if (error && !data) {
+    return (
+      <>
+        <Link to="/" className="muted">← Back to events</Link>
+        <p className="error">
+          {error === 'Event not found.'
+            ? 'This event is not available for your account. It may belong to another program, or it has not been approved yet.'
+            : error}
+        </p>
+      </>
+    );
+  }
   if (!data) return <p className="muted">Loading…</p>;
 
   const { event: ev, registered } = data;
@@ -41,7 +56,7 @@ export default function EventDetail() {
         <p>📅 {fmt(ev.start_at)} – {fmt(ev.end_at)}</p>
         <p>📍 {ev.location}</p>
         <p className="muted">
-          Registered: {ev.registered_count}{ev.capacity ? ` / ${ev.capacity}` : ''} · Fine per missed scan: ₱{Number(ev.fine_per_session).toFixed(2)}
+          Registered: {ev.registered_count}{ev.capacity ? ` / ${ev.capacity}` : ''} · Fine per missed scan: {peso(ev.fine_per_session)}
         </p>
 
         {msg && <p className="success">{msg}</p>}

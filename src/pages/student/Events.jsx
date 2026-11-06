@@ -4,25 +4,46 @@ import { api } from '../../api.js';
 import { useAuth } from '../../AuthContext.jsx';
 import { fmt } from '../../ui.jsx';
 
-function EventCard({ ev }) {
+function displayStatus(event, now) {
+  const start = new Date(String(event.start_at || '').replace(' ', 'T')).getTime();
+  const end = new Date(String(event.end_at || '').replace(' ', 'T')).getTime();
+  const status = String(event.status || '').toLowerCase();
+
+  if (status === 'pending' || status === 'rejected' || status === 'cancelled') return status;
+  if (Number.isFinite(end) && end < now) return 'done';
+  if (Number.isFinite(start) && start <= now && Number.isFinite(end) && end >= now) return 'ongoing';
+  return 'upcoming';
+}
+
+function EventCard({ event }) {
   return (
-    <Link to={`/events/${ev.id}`} className="card event">
-      {ev.poster_url ? <img className="poster" src={ev.poster_url} alt="" /> : <div className="poster empty">No poster</div>}
-      <h3>{ev.title}</h3>
-      <p className="muted">{ev.organization_name}</p>
-      <p>📅 {fmt(ev.start_at)}</p>
-      <p>📍 {ev.location}</p>
-      <p className="muted">Registered: {ev.registered_count}{ev.capacity ? ` / ${ev.capacity}` : ''}</p>
-    </Link>
+    <article className="admin-upcoming-card">
+      <div className="admin-card-image-wrap">
+        {event.poster_url
+          ? <img src={event.poster_url} alt={event.title || 'Event poster'} className="admin-card-image" />
+          : <div className="admin-card-image placeholder" aria-label="No event poster" />}
+        <span className={`admin-event-status ${event.display_status}`}>{event.display_status}</span>
+      </div>
+      <div className="admin-card-body">
+        <h2>{event.title || 'Untitled event'}</h2>
+        <p className="admin-meta-line">{event.organization_name || 'General'} · {event.location || 'TBD'}</p>
+        <p className="admin-meta-line">{fmt(event.start_at)}</p>
+        <p className="admin-meta-line">Registered: {event.registered_count || 0}</p>
+        <div className="admin-card-actions">
+          <Link to={`/events/${event.id}`} className="admin-button green small">View</Link>
+        </div>
+      </div>
+    </article>
   );
 }
 
-function Section({ title, events }) {
+function Group({ title, items }) {
+  if (items.length === 0) return null;
   return (
-    <section>
-      <h2>{title}</h2>
-      {events.length === 0 ? <p className="muted">Nothing here yet.</p> : <div className="grid">{events.map((e) => <EventCard key={e.id} ev={e} />)}</div>}
-    </section>
+    <>
+      <h2 style={{ margin: '24px 0 12px' }}>{title}</h2>
+      <div className="admin-card-grid">{items.map((e) => <EventCard key={e.id} event={e} />)}</div>
+    </>
   );
 }
 
@@ -31,20 +52,34 @@ export default function Events() {
   const [events, setEvents] = useState(null);
   const [error, setError] = useState('');
 
-  useEffect(() => { api.get('/events').then((d) => setEvents(d.events)).catch((e) => setError(e.message)); }, []);
+  useEffect(() => {
+    let active = true;
+    api.get('/events')
+      .then((data) => {
+        if (!Array.isArray(data?.events)) throw new Error('Unable to load events: invalid response.');
+        const now = Date.now();
+        if (active) setEvents(data.events.map((e) => ({ ...e, display_status: displayStatus(e, now) })));
+      })
+      .catch((e) => { if (active) setError(e.message); });
+    return () => { active = false; };
+  }, []);
 
   if (error) return <p className="error">{error}</p>;
   if (!events) return <p className="muted">Loading…</p>;
 
   return (
-    <>
-      <h1>Event Dashboard</h1>
-      <Section title="School-wide events" events={events.filter((e) => e.scope === 'school')} />
-      <Section
-        title={`Events for ${user.organization_name || 'your program'}`}
-        events={events.filter((e) => e.scope === 'program')}
-      />
-      {!user.organization_id && <p className="muted">Your account has no program yet, so only school-wide events are shown.</p>}
-    </>
+    <section className="admin-upcoming student-upcoming">
+      <h1 className="admin-page-title">Upcoming Events</h1>
+
+      {events.length === 0 && (
+        <div className="admin-state">
+          No events to show yet.
+          {!user.organization_id && ' Your account is not linked to a program, so only school-wide events can appear.'}
+        </div>
+      )}
+
+      <Group title="School-wide events" items={events.filter((e) => e.scope === 'school')} />
+      <Group title={`Events for ${user.organization_name || 'your program'}`} items={events.filter((e) => e.scope === 'program')} />
+    </section>
   );
 }

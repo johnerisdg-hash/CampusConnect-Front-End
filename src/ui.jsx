@@ -74,19 +74,27 @@ export function Shell({ title, links }) {
   };
   return (
     <>
-      <header className="topbar">
-        <div className="brand">CampusConnect{title && <span className="muted"> · {title}</span>}</div>
-        <nav>
+      <header className="admin-topbar student-topbar">
+        <div className="admin-brand">CampusConnect{title && <span> · {title}</span>}</div>
+        <nav className="admin-nav" aria-label="Student navigation">
           {links.map((l) => (
-            <NavLink key={l.to} to={l.to} end={l.end}>{l.label}</NavLink>
+            <NavLink
+              key={l.to}
+              to={l.to}
+              end={l.end}
+              className={({ isActive }) => (isActive ? 'admin-nav-link active' : 'admin-nav-link')}
+            >
+              {l.label}
+            </NavLink>
           ))}
         </nav>
-        <div className="grow" />
-        <ThemeToggle />
-        <span className="muted hide-sm">{user.name}</span>
-        <button className="btn ghost" onClick={signOut}>Logout</button>
+        <div className="admin-header-actions">
+          <ThemeToggle />
+          <span className="admin-user-label">{user.name}</span>
+          <button type="button" className="admin-logout" onClick={signOut}>Logout</button>
+        </div>
       </header>
-      <main className="container"><Outlet /></main>
+      <main className="admin-page student-page"><Outlet /></main>
     </>
   );
 }
