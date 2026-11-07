@@ -1,25 +1,22 @@
-const API_URL = import.meta.env.VITE_API_URL;
-
 async function request(path, options = {}) {
-  const res = await fetch(`${API_URL}/api${path}`, {
-    credentials: 'include',
-    ...options
-  });
+  let res;
+  try {
+    res = await fetch(`/api${path}`, { credentials: 'include', ...options });
+  } catch (err) {
+    console.error(`Network error calling /api${path}`, err);
+    throw new Error('Cannot reach the server. Please try again in a moment.');
+  }
 
   let data = null;
-
   try {
     data = await res.json();
   } catch {
-    // PHP error page is HTML, not JSON
+    // a PHP error page is HTML, not JSON
   }
 
   if (!res.ok) {
-    throw new Error(
-      data?.error || data?.message || `Request failed (${res.status})`
-    );
+    throw new Error(data?.error || data?.message || `Request failed (${res.status})`);
   }
-
   return data;
 }
 
