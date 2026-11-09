@@ -38,9 +38,19 @@ export default function EditEvent() {
 
   useEffect(() => {
     const organizationsRequest = isOrganizer ? Promise.resolve({ organizations: [] }) : api.get('/admin/organizations');
-    Promise.all([api.get('/admin/events'), organizationsRequest])
-      .then(([eventData, organizationData]) => {
-        const found = (eventData.events || []).find((item) => String(item.id) === String(id));
+    const findEvent = (events) => (events || []).find((item) => String(item.id) === String(id));
+    const eventRequest = api.get('/admin/events')
+      .then((data) => findEvent(data.events))
+      .catch((error) => {
+        if (!isOrganizer) throw error;
+        return null;
+      })
+      .then((found) => {
+        if (found || !isOrganizer) return found;
+        return api.get(`/events/${id}`).then((data) => data.event);
+      });
+    Promise.all([eventRequest, organizationsRequest])
+      .then(([found, organizationData]) => {
         if (!found) throw new Error('Event not found.');
         setEvent(found);
         setOrganizations(Array.isArray(organizationData.organizations) ? organizationData.organizations : []);
@@ -53,6 +63,7 @@ export default function EditEvent() {
           end_at: localDateTime(found.end_at),
           capacity: found.capacity || '',
           fine_per_session: found.fine_per_session ?? '25',
+          reason: '',
           poster: null
         });
       })
