@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api.js';
 import { fmt } from '../../ui.jsx';
+import { SkCards } from '../../skeleton.jsx';
+import PosterFrame from '../../PosterFrame.jsx';
 
 export default function UpcomingEvents({ basePath = '/admin' }) {
   const [upcoming, setUpcoming] = useState([]);
@@ -37,7 +39,7 @@ export default function UpcomingEvents({ basePath = '/admin' }) {
   }, []);
 
   if (error) return <div className="admin-state admin-error">{error}</div>;
-  if (loading) return <div className="admin-state">Loading…</div>;
+  if (loading) return <SkCards />;
 
   return (
     <section className="admin-upcoming">
@@ -48,7 +50,7 @@ export default function UpcomingEvents({ basePath = '/admin' }) {
           <article key={event.id ?? event.title} className="admin-upcoming-card">
             <div className="admin-card-image-wrap">
               {event.poster_url ? (
-                <img src={event.poster_url} alt={event.title} className="admin-card-image" />
+                <PosterFrame variant="card" src={event.poster_url} alt={event.title} />
               ) : (
                 <div className="admin-card-image placeholder" aria-label="No image" />
               )}

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../../api.js';
 import { Badge, fmt, peso, calendarUrl } from '../../ui.jsx';
+import PosterFrame from '../../PosterFrame.jsx';
+import { SkDetail } from '../../skeleton.jsx';
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -30,7 +32,7 @@ export default function EventDetail() {
   if (error && !data) {
     return (
       <>
-        <Link to="/" className="muted">← Back to events</Link>
+        <Link to="/" className="back-btn">← Back to events</Link>
         <p className="error">
           {error === 'Event not found.'
             ? 'This event is not available for your account. It may belong to another program, or it has not been approved yet.'
@@ -39,17 +41,17 @@ export default function EventDetail() {
       </>
     );
   }
-  if (!data) return <p className="muted">Loading…</p>;
+  if (!data) return <SkDetail />;
 
   const { event: ev, registered } = data;
   const cancelled = ev.status === 'cancelled';
   const full = ev.capacity && Number(ev.registered_count) >= Number(ev.capacity);
 
   return (
-    <>
-      <Link to="/" className="muted">← Back to events</Link>
+    <div className="detail-wrap">
+      <Link to="/" className="back-btn">← Back to events</Link>
       <div className="card detail">
-        {ev.poster_url && <img className="poster big" src={ev.poster_url} alt="" />}
+        {ev.poster_url && <PosterFrame src={ev.poster_url} alt={ev.title ? `${ev.title} poster` : 'Event poster'} />}
         <h1>{ev.title} {cancelled && <Badge tone="red">Cancelled</Badge>}</h1>
         <p className="muted">{ev.organization_name}</p>
         {ev.description && <p>{ev.description}</p>}
@@ -71,6 +73,6 @@ export default function EventDetail() {
           <a className="btn ghost" href={calendarUrl(ev)} target="_blank" rel="noreferrer">Add to Google Calendar</a>
         </div>
       </div>
-    </>
+    </div>
   );
 }

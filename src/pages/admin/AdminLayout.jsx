@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext.jsx';
+import logo from '../../assets/msu-logo.png';
 
 export default function AdminLayout() {
   const { logout } = useAuth();
@@ -13,7 +14,7 @@ export default function AdminLayout() {
   return (
     <>
       <header className="admin-topbar">
-        <div className="admin-brand">CampusConnect</div>
+        <div className="admin-brand"><img className="brand-logo" alt="Mindoro State University logo" src={logo} />CampusConnect</div>
 
         <nav className="admin-nav" aria-label="Admin navigation">
           <NavLink to="/admin" end className={({ isActive }) => (isActive ? 'admin-nav-link active' : 'admin-nav-link')}>

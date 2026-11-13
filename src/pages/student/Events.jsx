@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { api } from '../../api.js';
 import { useAuth } from '../../AuthContext.jsx';
 import { fmt } from '../../ui.jsx';
+import { SkCards } from '../../skeleton.jsx';
+import PosterFrame from '../../PosterFrame.jsx';
 
 function displayStatus(event, now) {
   const start = new Date(String(event.start_at || '').replace(' ', 'T')).getTime();
@@ -20,7 +22,7 @@ function EventCard({ event }) {
     <article className="admin-upcoming-card">
       <div className="admin-card-image-wrap">
         {event.poster_url
-          ? <img src={event.poster_url} alt={event.title || 'Event poster'} className="admin-card-image" />
+          ? <PosterFrame variant="card" src={event.poster_url} alt={event.title || 'Event poster'} />
           : <div className="admin-card-image placeholder" aria-label="No event poster" />}
         <span className={`admin-event-status ${event.display_status}`}>{event.display_status}</span>
       </div>
@@ -65,7 +67,7 @@ export default function Events() {
   }, []);
 
   if (error) return <p className="error">{error}</p>;
-  if (!events) return <p className="muted">Loading…</p>;
+  if (!events) return <SkCards feed count={3} section="admin-upcoming student-upcoming" />;
 
   return (
     <section className="admin-upcoming student-upcoming">

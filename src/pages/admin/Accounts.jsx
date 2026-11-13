@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api.js';
 import { Badge } from '../../ui.jsx';
+import { SkList } from '../../skeleton.jsx';
 
 const EMPTY = { full_name: '', email: '', password: '', organization_id: '', new_organization: '' };
 
@@ -135,7 +136,7 @@ export default function Accounts() {
     } catch (err) { setError(err.message); }
   }
 
-  if (!managers) return error ? <p className="error">{error}</p> : <p className="muted">Loading…</p>;
+  if (!managers) return error ? <p className="error">{error}</p> : <SkList />;
 
   return (
     <>

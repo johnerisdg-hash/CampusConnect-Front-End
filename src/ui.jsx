@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
 import logo from './assets/msu-logo.png';
@@ -18,21 +17,6 @@ export const calendarUrl = (ev) =>
 
 export function Badge({ tone = 'gray', children }) {
   return <span className={`badge ${tone}`}>{children}</span>;
-}
-
-export function ThemeToggle() {
-  const [theme, setTheme] = useState(document.documentElement.dataset.theme || 'dark');
-  const toggle = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    localStorage.setItem('theme', next);
-    setTheme(next);
-  };
-  return (
-    <button type="button" className="pill" onClick={toggle}>
-      {theme === 'dark' ? '☀ Light mode' : '☾ Dark mode'}
-    </button>
-  );
 }
 
 export function AuthLayout({ children }) {
@@ -56,7 +40,6 @@ export function AuthLayout({ children }) {
         </div>
       </aside>
       <main className="auth-main">
-        <div className="auth-top"><ThemeToggle /></div>
         <div className="auth-content">{children}</div>
       </main>
     </div>
@@ -75,7 +58,7 @@ export function Shell({ title, links }) {
   return (
     <>
       <header className="admin-topbar student-topbar">
-        <div className="admin-brand">CampusConnect{title && <span> · {title}</span>}</div>
+        <div className="admin-brand"><img className="brand-logo" alt="Mindoro State University logo" src={logo} />CampusConnect{title && <span> · {title}</span>}</div>
         <nav className="admin-nav" aria-label="Student navigation">
           {links.map((l) => (
             <NavLink
@@ -89,7 +72,6 @@ export function Shell({ title, links }) {
           ))}
         </nav>
         <div className="admin-header-actions">
-          <ThemeToggle />
           <span className="admin-user-label">{user.name}</span>
           <button type="button" className="admin-logout" onClick={signOut}>Logout</button>
         </div>

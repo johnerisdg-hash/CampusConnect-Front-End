@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../../api.js';
 import { fmt } from '../../ui.jsx';
 import { useAuth } from '../../AuthContext.jsx';
+import { SkTable } from '../../skeleton.jsx';
 
 function statusLabel(raw) {
   const s = String(raw || '').toLowerCase();
@@ -62,7 +63,7 @@ export default function AdminDashboard({ basePath = '/admin' }) {
     [events]
   );
 
-  if (loading && events.length === 0) return <div className="admin-state">Loading…</div>;
+  if (loading && events.length === 0) return <SkTable />;
   if (rows.length === 0) {
     return (
       <section className="admin-dashboard">
@@ -93,20 +94,20 @@ export default function AdminDashboard({ basePath = '/admin' }) {
           <tbody>
             {rows.map((event) => (
               <tr key={event.id ?? `${event.title}-${event.start_at}`}>
-                <td>
+                <td data-label="Event">
                   <div className="admin-event-cell-title">{event.title}</div>
                   <div className="admin-event-cell-sub">{event.org}</div>
                 </td>
-                <td>
+                <td data-label="Date">
                   <div className="admin-date-main">{fmt(event.start_at)}</div>
                 </td>
-                <td>
+                <td data-label="Status">
                   <span className={`admin-status-pill ${event.status}`}>{event.status}</span>
                 </td>
-                <td>{event.registered}</td>
-                <td>{event.attended}</td>
-                <td>{event.fines == null ? '—' : `₱${event.fines.toFixed(2)}`}</td>
-                <td>
+                <td data-label="Registered">{event.registered}</td>
+                <td data-label="Attended (1+ scan)">{event.attended}</td>
+                <td data-label="Fines">{event.fines == null ? '—' : `₱${event.fines.toFixed(2)}`}</td>
+                <td data-label="Actions" className="admin-actions-cell">
                   <div className="admin-action-stack">
                     {isAdmin && !['approved', 'cancelled'].includes(event.status) ? (
                       <Link

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../api.js';
 import { fmt, peso } from '../../ui.jsx';
+import { SkDetail } from '../../skeleton.jsx';
 
 const FIELDS = [
   ['title', 'Title'], ['description', 'Description'], ['location', 'Venue'],
@@ -47,12 +48,12 @@ export default function ReviewChange() {
     } catch (e) { setError(e.message); setBusy(false); }
   }
 
-  if (!req || !ev) return error ? <p className="error">{error}</p> : <p className="muted">Loading…</p>;
+  if (!req || !ev) return error ? <p className="error">{error}</p> : <SkDetail />;
   const changes = req.changes || {};
 
   return (
     <>
-      <Link to="/admin" className="muted">← Back to approvals</Link>
+      <Link to="/admin" className="back-btn">← Back to approvals</Link>
       <h1>Review change request</h1>
       <div className="card">
         <h3>{ev.title}</h3>

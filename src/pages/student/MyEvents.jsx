@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api.js';
 import { Badge, fmt, peso } from '../../ui.jsx';
+import { SkPass } from '../../skeleton.jsx';
 
 function status(r, totalSlots) {
   if (r.status === 'cancelled') return { tone: 'gray', text: 'Event cancelled' };
@@ -32,7 +33,7 @@ export default function MyEvents() {
   useEffect(() => { api.get('/my-registrations').then(setData).catch((e) => setError(e.message)); }, []);
 
   if (error) return <p className="error">{error}</p>;
-  if (!data) return <p className="muted">Loading…</p>;
+  if (!data) return <SkPass />;
 
   const { registrations, slots, total_fines } = data;
   const totalSlots = Object.keys(slots).length;

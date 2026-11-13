@@ -76,7 +76,7 @@ export default function ScanEvent() {
 
   return (
     <section className="admin-scan-page">
-      <Link className="admin-back-link" to={`${basePath}/dashboard`}>← Back to dashboard</Link>
+      <Link className="admin-back-link back-btn" to={`${basePath}/dashboard`}>← Back to dashboard</Link>
       <h1 className="admin-page-title">{event ? `Scan attendance: ${event.title}` : 'Scan attendance'}</h1>
 
       {error && <p className="admin-form-message error" role="alert">{error}</p>}

@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../../api.js';
 import { fmt, peso } from '../../ui.jsx';
 import { useAuth } from '../../AuthContext.jsx';
+import { SkTable } from '../../skeleton.jsx';
 
 export default function Attendance() {
   const { id } = useParams();
@@ -42,15 +43,15 @@ export default function Attendance() {
     }
   }
 
-  if (loading && !data) return <div className="admin-state">Loading attendance…</div>;
-  if (!data) return <section className="admin-attendance"><p className="admin-state admin-error">{error}</p><Link className="admin-back-link" to={`${basePath}/dashboard`}>Back to dashboard</Link></section>;
+  if (loading && !data) return <SkTable summary section="admin-attendance" />;
+  if (!data) return <section className="admin-attendance"><p className="admin-state admin-error">{error}</p><Link className="admin-back-link back-btn" to={`${basePath}/dashboard`}>Back to dashboard</Link></section>;
 
   const { event, rows = [], slots = {}, total_fines = 0 } = data;
   const cancelled = event.status === 'cancelled';
 
   return (
     <section className="admin-attendance">
-      <Link className="admin-back-link" to={`${basePath}/dashboard`}>← Back to dashboard</Link>
+      <Link className="admin-back-link back-btn" to={`${basePath}/dashboard`}>← Back to dashboard</Link>
       <h1 className="admin-page-title">{event.title}</h1>
       <div className="admin-attendance-summary card">
         <p>Registered: <b>{rows.length}</b></p>
@@ -81,12 +82,12 @@ export default function Attendance() {
             <tbody>
               {rows.map((row) => (
                 <tr key={row.id}>
-                  <td>
+                  <td data-label="Student">
                     <div className="admin-event-cell-title">{row.full_name}</div>
                     <div className="admin-event-cell-sub">{row.email}</div>
                   </td>
                   {Object.keys(slots).map((key) => (
-                    <td key={key}>
+                    <td key={key} data-label={slots[key]}>
                       {row.scans?.[key]
                         ? <span className="admin-attendance-mark">{fmt(row.scans[key])}</span>
                         : row.summary?.final && !cancelled
@@ -94,8 +95,8 @@ export default function Attendance() {
                           : '—'}
                     </td>
                   ))}
-                  <td>{row.summary?.attended || 0}/{Object.keys(slots).length}</td>
-                  <td>{cancelled ? '—' : row.summary?.final ? peso(row.summary.fine) : 'Pending'}</td>
+                  <td data-label="Attended">{row.summary?.attended || 0}/{Object.keys(slots).length}</td>
+                  <td data-label="Fine">{cancelled ? '—' : row.summary?.final ? peso(row.summary.fine) : 'Pending'}</td>
                 </tr>
               ))}
             </tbody>

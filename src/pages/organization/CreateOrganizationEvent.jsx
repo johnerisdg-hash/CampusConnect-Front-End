@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { api } from '../../api.js';
 import { useAuth } from '../../AuthContext.jsx';
 
 const initialForm = {
-  organization_id: '',
   title: '',
   description: '',
   location: '',
@@ -16,26 +15,11 @@ const initialForm = {
 
 export default function CreateOrganizationEvent() {
   const { user } = useAuth();
-  const [organizations, setOrganizations] = useState([]);
+  const organizationId = String(user?.organization_id || '');
   const [form, setForm] = useState(initialForm);
   const [saving, setSaving] = useState(false);
-  const [loadingOrganizations, setLoadingOrganizations] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
-  useEffect(() => {
-    api.get('/programs')
-      .then((data) => {
-        const available = Array.isArray(data.programs) ? data.programs : [];
-        setOrganizations(available);
-        setForm((current) => ({
-          ...current,
-          organization_id: String(user?.organization_id || '')
-        }));
-      })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoadingOrganizations(false));
-  }, [user?.organization_id]);
 
   function updateField(key, value) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -47,8 +31,8 @@ export default function CreateOrganizationEvent() {
     setError('');
     setSuccess('');
 
-    if (!form.organization_id) {
-      setError('Select an organization before submitting.');
+    if (!organizationId) {
+      setError('Your account is not linked to an organization.');
       setSaving(false);
       return;
     }
@@ -56,7 +40,7 @@ export default function CreateOrganizationEvent() {
     try {
       const body = new FormData();
       body.append('scope', 'program');
-      body.append('organization_id', form.organization_id);
+      body.append('organization_id', organizationId);
       body.append('title', form.title);
       body.append('description', form.description);
       body.append('location', form.location);
@@ -86,19 +70,7 @@ export default function CreateOrganizationEvent() {
       <form className="admin-create-form" onSubmit={submit}>
         <label className="admin-form-field">
           <span>Organization</span>
-          <select
-            value={form.organization_id}
-            onChange={(e) => updateField('organization_id', e.target.value)}
-            required
-            disabled={loadingOrganizations || organizations.length === 0}
-          >
-            <option value="">
-              {loadingOrganizations ? 'Loading organizations…' : organizations.length ? 'Select organization' : 'No organizations available'}
-            </option>
-            {organizations.map((organization) => (
-              <option key={organization.id} value={organization.id}>{organization.name}</option>
-            ))}
-          </select>
+          <input value={user?.organization_name || 'Organization not assigned'} readOnly />
         </label>
 
         <label className="admin-form-field">
@@ -143,7 +115,7 @@ export default function CreateOrganizationEvent() {
 
         {error && <p className="admin-form-message error" role="alert">{error}</p>}
         {success && <p className="admin-form-message success" role="status">{success}</p>}
-        <button type="submit" className="admin-submit" disabled={saving || loadingOrganizations || organizations.length === 0 || !form.organization_id}>
+        <button type="submit" className="admin-submit" disabled={saving || !organizationId}>
           {saving ? 'Submitting…' : 'Submit for approval'}
         </button>
       </form>

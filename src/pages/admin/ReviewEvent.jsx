@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../api.js';
 import { Badge, fmt, peso } from '../../ui.jsx';
+import { SkDetail } from '../../skeleton.jsx';
+import PosterFrame from '../../PosterFrame.jsx';
 
 export default function ReviewEvent() {
   const { id } = useParams();
@@ -33,17 +35,17 @@ export default function ReviewEvent() {
     }
   }
 
-  if (!ev) return error ? <p className="error">{error}</p> : <p className="muted">Loading…</p>;
+  if (!ev) return error ? <p className="error">{error}</p> : <SkDetail />;
   const waiting = ev.status === 'pending';
 
   return (
     <>
-      <Link to={returnTo} className="muted">← Back to approvals</Link>
+      <Link to={returnTo} className="back-btn">← Back to approvals</Link>
       <h1>Review event</h1>
 
       <div className="card detail">
         {ev.poster_url
-          ? <img className="poster big" src={ev.poster_url} alt="Event poster" />
+          ? <PosterFrame src={ev.poster_url} alt="Event poster" />
           : <div className="poster big empty">No poster uploaded</div>}
         <h2>{ev.title}</h2>
         <table className="kv">

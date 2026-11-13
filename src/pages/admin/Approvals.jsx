@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { api } from '../../api.js';
 import { fmt } from '../../ui.jsx';
+import { SkList } from '../../skeleton.jsx';
 
 export default function Approvals() {
   const { state } = useLocation();
@@ -16,7 +17,7 @@ export default function Approvals() {
   }, []);
 
   if (error) return <p className="error">{error}</p>;
-  if (!events || !requests) return <p className="muted">Loading…</p>;
+  if (!events || !requests) return <SkList />;
 
   return (
     <>

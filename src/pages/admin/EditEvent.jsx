@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../api.js';
 import { useAuth } from '../../AuthContext.jsx';
+import { SkForm } from '../../skeleton.jsx';
+import PosterFrame from '../../PosterFrame.jsx';
 
 const emptyForm = {
   organization_id: '',
@@ -38,9 +40,19 @@ export default function EditEvent() {
 
   useEffect(() => {
     const organizationsRequest = isOrganizer ? Promise.resolve({ organizations: [] }) : api.get('/admin/organizations');
-    Promise.all([api.get('/admin/events'), organizationsRequest])
-      .then(([eventData, organizationData]) => {
-        const found = (eventData.events || []).find((item) => String(item.id) === String(id));
+    const findEvent = (events) => (events || []).find((item) => String(item.id) === String(id));
+    const eventRequest = api.get('/admin/events')
+      .then((data) => findEvent(data.events))
+      .catch((error) => {
+        if (!isOrganizer) throw error;
+        return null;
+      })
+      .then((found) => {
+        if (found || !isOrganizer) return found;
+        return api.get(`/events/${id}`).then((data) => data.event);
+      });
+    Promise.all([eventRequest, organizationsRequest])
+      .then(([found, organizationData]) => {
         if (!found) throw new Error('Event not found.');
         setEvent(found);
         setOrganizations(Array.isArray(organizationData.organizations) ? organizationData.organizations : []);
@@ -53,6 +65,7 @@ export default function EditEvent() {
           end_at: localDateTime(found.end_at),
           capacity: found.capacity || '',
           fine_per_session: found.fine_per_session ?? '25',
+          reason: '',
           poster: null
         });
       })
@@ -124,12 +137,12 @@ export default function EditEvent() {
     }
   }
 
-  if (loading) return <div className="admin-state">Loading event…</div>;
-  if (!event) return <section className="admin-edit-event"><p className="admin-state admin-error">{error || 'Event not found.'}</p><Link className="admin-back-link" to={basePath}>Back to events</Link></section>;
+  if (loading) return <SkForm fields={7} section="admin-edit-event" />;
+  if (!event) return <section className="admin-edit-event"><p className="admin-state admin-error">{error || 'Event not found.'}</p><Link className="admin-back-link back-btn" to={basePath}>Back to events</Link></section>;
 
   return (
     <section className="admin-edit-event">
-      <Link className="admin-back-link" to={basePath}>← Back to events</Link>
+      <Link className="admin-back-link back-btn" to={basePath}>← Back to events</Link>
       <h1 className="admin-page-title">{isApprovedOrganizerEvent ? 'Request Event Changes' : 'Edit Event'}</h1>
       {isApprovedOrganizerEvent && (
         <p className="org-approval-note">
@@ -192,7 +205,7 @@ export default function EditEvent() {
 
         <label className="admin-form-field">
           <span>Poster (leave empty to keep the current one)</span>
-          {event.poster_url && <img className="admin-edit-poster" src={event.poster_url} alt="Current event poster" />}
+          {event.poster_url && <PosterFrame variant="small" src={event.poster_url} alt="Current event poster" />}
           <input type="file" accept="image/*" onChange={(e) => updateField('poster', e.target.files?.[0] || null)} />
         </label>
 
